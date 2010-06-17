@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <style type="text/css">
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      .timezone {
+        text-align: center;
+      }
+
+      .title {
+        font: 12px arial;
+        height: 20px;
+        line-height: 20px;
+      }
+      
+      .clock {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        background: url(images/clockface.png) no-repeat 0 0;
+        list-style: none;
+        padding: 0;
+        margin: 0 20px 20px 20px;
+      }
+      
+      .sec, .min, .hour {
+        position: absolute;
+        width: 5px;
+        height: 100px;
+        top: 0px;
+        left: 48px;
+      }
+      
+      .sec {
+        background: url(images/sechand.png);
+        z-index: 3;
+      }
+         
+      .min {
+        background: url(images/minhand.png);
+        z-index: 2;
+      }
+         
+      .hour {
+        background: url(images/hourhand.png);
+        z-index: 1;
+      }
+    </style>
+</head>
+<body>
+  <script type="text/javascript">
+    function calcOffsetTime(offset) {
+      var now = new Date();
+      var utc = now.getTime() + now.getTimezoneOffset() * 60000;
+      var offset_time = new Date(utc + 3600000 * offset);
+      return offset_time;
+    }
+    function rotate() {
+      $.each($('.timezone'), function(i, timezone) {
+        var offsetTime = calcOffsetTime($(timezone).data('offset'));
+        var seconds = offsetTime.getSeconds();
+        var mins = offsetTime.getMinutes();
+        var hours = offsetTime.getHours();
+
+        var sdegree = seconds * 6;
+        var srotate = "rotate(" + sdegree + "deg)";
+        $(timezone).find('.sec').css('-webkit-transform', srotate);
+        var mdegree = mins * 6;
+        var mrotate = "rotate(" + mdegree + "deg)";
+        $(timezone).find('.min').css('-webkit-transform', mrotate);
+        var hdegree = hours * 30 + (mins / 2);
+        var hrotate = "rotate(" + hdegree + "deg)";
+        $(timezone).find('.hour').css('-webkit-transform', hrotate);
+      });
+    }
+    function createTimezone(timezone, offset) {
+      var $timezone = $("<div class='timezone'></div>");
+      var $title = $("<div class='title'>"+timezone+"</div>");
+      var $clock = $("<ul class='clock'><li class='sec'></li><li class='min'></li><li class='hour'></li></ul>");
+      $timezone.append($title).append($clock);
+      $timezone.data('offset', parseInt(offset) / 100);
+      $('body').append($timezone);
+      rotate();
+    }
+    $(function() {
+      var multi_timezones = JSON.parse(localStorage["multi_timezones"]);
+      if (multi_timezones.length > 0) {
+        $.each(multi_timezones, function(i, timezone) {
+        //$.each(['Asia/Shanghai', 'Europe/Paris', 'Asia/Shanghai', 'Europe/Paris'], function(i, timezone) {
+          $.getJSON("http://json-time.appspot.com/time.json?tz="+timezone+"&callback=?", function(data) {
+            var offset = data.datetime.substring(26);
+            offset = offset.replace(/([+-])0/, '$1');
+            createTimezone(timezone, offset);
+          });
+        });
+      } else {
+        var offset = new Date().getTimezoneOffset();
+        offset = -offset * 100 / 60;
+        createTimezone('Local Time', offset);
+      }
+      setInterval( function() {
+        rotate();
+      }, 1000 );
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+</head>
+<body>
+  <div class="settings">
+    <div class="title">Clock Chrome Extension (Settings)</div>
+    <select id="timezone"></select>
+    <button type="button" onclick="addTimeZone()">Add</button>
+    <select id="multi_timezones" multiple="multiple" ondblclick="delTimeZone()"></select>
+    <label>Double click to remove a timezone</label>
+  </div>
+  <script type="text/javascript">
+    function addTimeZone() {
+      $("#multi_timezones").append($("<option value='"+$("#timezone").val()+"'>"+$("#timezone").val()+"</option>"));
+      updateStorage();
+    }
+    function delTimeZone() {
+      $("#multi_timezones option:selected").remove();
+      updateStorage();
+    }
+    function updateStorage() {
+      var timezones = new Array();
+      $.each($("#multi_timezones option"), function(i, option) {
+        timezones.push($(option).val());
+      });
+      localStorage["multi_timezones"] = JSON.stringify(timezones);
+    }
+    $(function() {
+      $.getJSON("http://json-time.appspot.com/timezones.json?callback=?", function(data) {
+        var options = [];
+        $.each(data, function(i, city) {
+          options.push("<option value='"+city+"'>"+city+"</option>");
+        });
+        $('#timezone').html(options.join(''));
+        $.each(JSON.parse(localStorage["multi_timezones"]), function(i, city) {
+          $('#multi_timezones').append($("<option value='"+city+"'>"+city+"</option>"));
+        });
+      });
+    });
+  </script>
+</body>
+</html>
