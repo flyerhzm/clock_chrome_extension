@@ -89,9 +89,8 @@
       rotate();
     }
     $(function() {
-      var multi_timezones = JSON.parse(localStorage["multi_timezones"]);
-      if (multi_timezones.length > 0) {
-        $.each(multi_timezones, function(i, timezone) {
+      if (localStorage["multi_timezones"] && JSON.parse(localStorage["multi_timezones"]).length > 0) {
+        $.each(JSON.parse(localStorage["multi_timezones"]), function(i, timezone) {
         //$.each(['Asia/Shanghai', 'Europe/Paris', 'Asia/Shanghai', 'Europe/Paris'], function(i, timezone) {
           $.getJSON("http://json-time.appspot.com/time.json?tz="+timezone+"&callback=?", function(data) {
             var offset = data.datetime.substring(26);
