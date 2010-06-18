@@ -14,8 +14,13 @@
   </div>
   <script type="text/javascript">
     function addTimeZone() {
-      $("#multi_timezones").append($("<option value='"+$("#timezone").val()+"'>"+$("#timezone").val()+"</option>"));
-      updateStorage();
+      var timezone = $("#timezone").val();
+      $.getJSON("http://json-time.appspot.com/time.json?tz="+timezone+"&callback=?", function(data) {
+        var offset = data.datetime.substring(26);
+        offset = offset.replace(/([+-])0/, '$1');
+        $("#multi_timezones").append($("<option value='"+offset+"'>"+timezone+"</option>"));
+        updateStorage();
+      });
     }
     function delTimeZone() {
       $("#multi_timezones option:selected").remove();
@@ -23,10 +28,13 @@
     }
     function updateStorage() {
       var timezones = new Array();
+      var offsets = new Array();
       $.each($("#multi_timezones option"), function(i, option) {
-        timezones.push($(option).val());
+        timezones.push($(option).text());
+        offsets.push($(option).val());
       });
       localStorage["multi_timezones"] = JSON.stringify(timezones);
+      localStorage["multi_offsets"] = JSON.stringify(offsets);
     }
     $(function() {
       $.getJSON("http://json-time.appspot.com/timezones.json?callback=?", function(data) {
