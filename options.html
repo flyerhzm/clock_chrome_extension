@@ -9,17 +9,20 @@
     <div class="title">Clock Chrome Extension (Settings)</div>
     <select id="timezone"></select>
     <button type="button" onclick="addTimeZone()">Add</button>
+    <img src="images/loading.gif"></img>
     <select id="multi_timezones" multiple="multiple" ondblclick="delTimeZone()"></select>
     <label>Double click to remove a timezone</label>
   </div>
   <script type="text/javascript">
     function addTimeZone() {
+      $('img').show();
       var timezone = $("#timezone").val();
       $.getJSON("http://json-time.appspot.com/time.json?tz="+timezone+"&callback=?", function(data) {
         var offset = data.datetime.substring(26);
         offset = offset.replace(/([+-])0/, '$1');
         $("#multi_timezones").append($("<option value='"+offset+"'>"+timezone+"</option>"));
         updateStorage();
+        $('img').hide();
       });
     }
     function delTimeZone() {
@@ -43,9 +46,15 @@
           options.push("<option value='"+city+"'>"+city+"</option>");
         });
         $('#timezone').html(options.join(''));
-        $.each(JSON.parse(localStorage["multi_timezones"]), function(i, city) {
-          $('#multi_timezones').append($("<option value='"+city+"'>"+city+"</option>"));
-        });
+        if (localStorage["multi_timezones"] && localStorage["multi_offsets"] && JSON.parse(localStorage["multi_timezones"]).length > 0) {
+          var multi_timezones = JSON.parse(localStorage["multi_timezones"]);
+          var offsets = JSON.parse(localStorage["multi_offsets"]);
+          $.each(multi_timezones, function(i, timezone) {
+            var offset = offsets[i];
+            $('#multi_timezones').append($("<option value='"+offset+"'>"+timezone+"</option>"));
+          });
+        }
+        $('img').hide();
       });
     });
   </script>
