@@ -5,11 +5,10 @@
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
     <style type="text/css">
       body { margin: 0; padding: 0; }
-      .timezone { text-align: center; }
-      .title { font: 12px arial; height: 20px; line-height: 20px; }
-      .hint { font: 12px arial; height: 20px; line-height: 20px; }
-      .clock { position: relative; width: 100px; height: 100px; background: url(images/clockface.png) no-repeat 0 0; list-style: none; padding: 0; margin: 0 20px 20px 20px; }
-      .sec, .min, .hour { position: absolute; width: 5px; height: 100px; top: 0px; left: 48px; }
+      .timezone { text-align: center; padding-top; 50px; display: inline-block; }
+      .title, .hint { font: 14px arial; height: 20px; line-height: 20px; width: 200px; margin: 0 auto; }
+      .clock { position: relative; width: 200px; height: 200px; background: url(images/clockface.png) no-repeat 0 0; list-style: none; padding: 0; margin: 0 20px; }
+      .sec, .min, .hour { position: absolute; width: 10px; height: 200px; top: 0px; left: 96px; }
       .sec { background: url(images/sechand.png); z-index: 3; }
       .min { background: url(images/minhand.png); z-index: 2; }
       .hour { background: url(images/hourhand.png); z-index: 1; }
@@ -50,10 +49,17 @@
       $('body').append($timezone);
       rotate();
     }
+    function initBodyWidth() {
+      var width = JSON.parse(localStorage["multi_timezones"]).length * 240;
+      if (width > 720) { width = 720; }
+      $('body').width(width+"px");
+    }
     $(function() {
       if (localStorage["multi_timezones"] && localStorage["multi_offsets"] && JSON.parse(localStorage["multi_timezones"]).length > 0) {
-        var offsets = JSON.parse(localStorage["multi_offsets"])
-        $.each(JSON.parse(localStorage["multi_timezones"]), function(i, timezone) {
+        initBodyWidth();
+        var multi_timezones = JSON.parse(localStorage["multi_timezones"]);
+        var offsets = JSON.parse(localStorage["multi_offsets"]);
+        $.each(multi_timezones, function(i, timezone) {
           var offset = offsets[i];
           createTimezone(timezone, offset);
         });
