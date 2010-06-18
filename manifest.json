@@ -1,7 +1,7 @@
 {
   "name": "Clock",
-  "version": "1.1",
-  "description": "Display a Clock Anolog.",
+  "version": "2.0",
+  "description": "Display multiple clock anologs for multiple timezones.",
   "icons": { "128": "icon_128.png" },
   "browser_action": {
     "default_icon": "icon.png",
